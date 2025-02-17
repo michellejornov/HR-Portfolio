@@ -1,0 +1,155 @@
+SELECT * FROM employees 
+
+1. How many employees has the company ever had?
+
+SELECT COUNT(*) AS total_employees
+FROM employees;
+
+2. How many employees are currently employed?
+
+SELECT COUNT(employee_id)
+FROM employees
+WHERE leave_date=''
+;
+
+
+3. Which location has the most currently employed employees?
+
+SELECT location, COUNT(employee_id) AS employee_count
+FROM employees
+WHERE (leave_date IS NULL OR leave_date = '')
+  AND hire_date IS NOT NULL
+GROUP BY location
+ORDER BY employee_count DESC
+LIMIT 1;
+
+
+
+
+4. How many employees were active during the year 2023?
+
+SELECT race, COUNT(employee_id) AS employee_count
+FROM employees
+WHERE (leave_date IS NULL OR leave_date = '')
+  AND hire_date IS NOT NULL
+GROUP BY race
+ORDER BY employee_count DESC;
+  
+
+5. What percentage of all-time employees are currently employed?
+
+SELECT SUM(CASE WHEN leave_date='' THEN 1.0 ELSE 0.0 END)/ COUNT(employee_id) * 100 as percent_current
+FROM employees 
+
+
+6. How many current employees are there of each race?
+
+SELECT race, COUNT(employee_id) AS employee_count
+FROM employees
+WHERE (leave_date IS NULL OR leave_date = '')
+  AND hire_date IS NOT NULL
+GROUP BY race
+ORDER BY employee_count DESC;
+
+
+7. What percentage of current employees are of each gender?
+
+SELECT gender,
+       ROUND(COUNT(employee_id) * 100.0 / (SELECT COUNT(employee_id) FROM employees WHERE (leave_date IS NULL OR leave_date = '') AND hire_date IS NOT NULL), 1) AS gender_percentage
+FROM employees
+WHERE (leave_date IS NULL OR leave_date = '') AND hire_date IS NOT NULL
+GROUP BY gender
+ORDER BY gender_percentage DESC;
+
+
+
+
+9. Which active employee has the highest salary?
+
+SELECT employee_id, first_name, last_name, salary
+FROM employees
+WHERE (leave_date IS NULL OR leave_date = '')
+  AND hire_date IS NOT NULL
+ORDER BY salary DESC
+LIMIT 1;
+
+
+
+10. What is that employee’s job?
+
+SELECT employees.employee_id, employees.first_name, employees.last_name, employees.salary, positions.job_title
+FROM employees
+JOIN positions ON employees.position_id = positions.position_id
+WHERE (employees.leave_date IS NULL OR employees.leave_date = '')
+  AND employees.hire_date IS NOT NULL
+ORDER BY employees.salary DESC
+LIMIT 1;
+
+
+
+11. What is the highest salary in each location?
+
+SELECT location, MAX(salary)
+FROM employees
+GROUP BY location;
+
+
+
+
+12. What is the average salary for each location?
+
+SELECT location, AVG(salary) AS average_salary
+FROM employees 
+GROUP BY location;
+
+13.How long has each employee been at the company?
+
+SELECT employee_id, first_name, last_name,
+       (CASE 
+            WHEN leave_date = '' OR leave_date IS NULL THEN DATE('now') 
+            ELSE leave_date 
+        END) - hire_date AS employment_length
+FROM employees;
+
+
+14. Which employee spent the longest time at the company?
+
+SELECT employee_id, first_name, last_name,
+       MAX((CASE WHEN leave_date = '' OR leave_date IS NULL THEN DATE('now') ELSE leave_date END) - hire_date) AS employment_length
+FROM employees
+WHERE hire_date IS NOT NULL
+GROUP BY employee_id, first_name, last_name
+ORDER BY employment_length DESC
+LIMIT 1;
+
+
+
+
+15. How many employees are over the age of 60?
+
+SELECT COUNT(*) AS employees_over_60
+FROM employees
+WHERE birthdate <= DATE('now', '-60 years');
+
+18. What is the average salary for junior employees?
+
+SELECT AVG(salary)
+FROM employees
+LEFT JOIN positions
+ON employees.position_id =positions.position_id
+WHERE level='Junior';
+
+
+
+ 
+      
+
+
+
+
+
+
+
+
+
+
